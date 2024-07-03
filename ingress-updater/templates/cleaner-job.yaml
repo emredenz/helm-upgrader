@@ -1,0 +1,25 @@
+{{- if .Values.cleaner.create -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ingress-updater.fullname" . }}-cleaner
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "ingress-updater.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}-cleaner
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              #!/bin/sh
+              set -e
+
+              kubectl delete job "{{ include "ingress-updater.fullname" . }}" -n $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+              kubectl delete job "{{ include "ingress-updater.fullname" . }}"-cleaner -n $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+              done
+
+      restartPolicy: OnFailure
+{{- end }}
