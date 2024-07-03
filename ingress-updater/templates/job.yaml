@@ -6,10 +6,10 @@ spec:
   template:
     spec:
       serviceAccountName: {{ include "ingress-updater.serviceAccountName" . }}
-      initContainers:
-        - name: init-container
-          image: busybox
-          command: [ 'sh', '-c', 'until kubectl get job "{{ include "ingress-updater.fullname" . }}" -n $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace) -o jsonpath="{.status.succeeded}" | grep -q 1; do sleep 1; done' ]
+{{/*      initContainers:*/}}
+{{/*        - name: init-container*/}}
+{{/*          image: busybox*/}}
+{{/*          command: [ 'sh', '-c', 'until kubectl get job "{{ include "ingress-updater.fullname" . }}" -n $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace) -o jsonpath="{.status.succeeded}" | grep -q 1; do sleep 1; done' ]*/}}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
