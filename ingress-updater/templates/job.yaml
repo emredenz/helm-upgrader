@@ -2,6 +2,8 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ include "ingress-updater.fullname" . }}
+  annotations:
+    argocd.argoproj.io/sync-options: '{"prune":true}'
 spec:
   template:
     spec:
