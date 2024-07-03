@@ -28,4 +28,4 @@ roleBinding:
 host: domain.local
 
 cleaner:
-  create:false
+  create: false
