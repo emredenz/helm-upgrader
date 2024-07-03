@@ -46,5 +46,5 @@ spec:
               done
               echo "deleting cleaner job"
               kubectl delete job "{{ include "ingress-host-adder.fullname" . }}" -n $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
-
+              sleep 1000
       restartPolicy: OnFailure
