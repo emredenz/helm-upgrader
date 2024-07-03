@@ -1,11 +1,11 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "ingress-updater.fullname" . }}
+  name: {{ include "ingress-host-adder.fullname" . }}
 spec:
   template:
     spec:
-      serviceAccountName: {{ include "ingress-updater.serviceAccountName" . }}
+      serviceAccountName: {{ include "ingress-host-adder.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -41,6 +41,6 @@ spec:
               kubectl apply -f /tmp/updated-ingress.json -n $namespace
               done
               echo "deleting cleaner job"
-              kubectl delete job "{{ include "ingress-updater.fullname" . }}" -n $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+              kubectl delete job "{{ include "ingress-host-adder.fullname" . }}" -n $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 
       restartPolicy: OnFailure
