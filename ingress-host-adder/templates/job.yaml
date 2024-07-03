@@ -5,6 +5,10 @@ metadata:
 spec:
   template:
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "ingress-host-adder.serviceAccountName" . }}
       containers:
         - name: {{ .Chart.Name }}
