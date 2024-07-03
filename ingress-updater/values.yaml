@@ -26,6 +26,3 @@ roleBinding:
   create: true
 
 host: domain.local
-
-cleaner:
-  create: false
