@@ -43,7 +43,7 @@ spec:
               # Apply the updated ingress
               kubectl apply -f /tmp/updated-ingress.json -n $namespace
               done
-{{/*              echo "deleting cleaner job"*/}}
-{{/*              kubectl delete job "{{ include "ingress-updater.fullname" . }}"-cleaner -n $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)*/}}
+              echo "deleting cleaner job"
+              kubectl delete job "{{ include "ingress-updater.fullname" . }}" -n $(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 
       restartPolicy: OnFailure
