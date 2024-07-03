@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ingress-updater.fullname" . }}
+spec:
+  template:
+    spec:
+      serviceAccountName: {{ include "ingress-updater.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - |
+              #!/bin/sh
+              set -e
+
+              NEW_HOST="{{ .Values.host }}"
+
+              # Get the list of all Ingresses
+              kubectl get ingress -o json > /tmp/ingresses.json
+
+              # Iterate over each Ingress
+              for ingress in $(jq -r '.items[].metadata.name' /tmp/ingresses.json); do
+              namespace=$(jq -r '.items[] | select(.metadata.name=="'$ingress'") | .metadata.namespace' /tmp/ingresses.json)
+              kubectl get ingress $ingress -n $namespace -o json > /tmp/ingress.json
+
+              # Check if the new host already exists
+              EXISTING_HOST=$(jq -r '.spec.rules[] | select(.host=="'$NEW_HOST'") | .host' /tmp/ingress.json)
+
+              if [ -n "$EXISTING_HOST" ]; then
+              echo "Host $NEW_HOST already exists in the Ingress $ingress in namespace $namespace"
+              continue
+              fi
+
+              # Add the new host
+              jq --arg new_host "$NEW_HOST" '.spec.rules += [{"host": $new_host, "http": .spec.rules[0].http}]' /tmp/ingress.json > /tmp/updated-ingress.json
+
+              # Apply the updated ingress
+              kubectl apply -f /tmp/updated-ingress.json -n $namespace
+              done
+
+      restartPolicy: OnFailure
